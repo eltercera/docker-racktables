@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
 
-FROM registry.okd.ucab.edu.ve/images/alpine:3.9
+FROM alpine:3.9
 MAINTAINER Rómulo Rodríguez <rjrodrig@ucab.edu.ve>
 
 RUN apk --no-cache update \
