@@ -70,15 +70,18 @@ ADD httpd.conf.template /etc/apache2/httpd.conf.template
 ADD docker-entrypoint.sh make_racktables_secret.php init_racktables_db.php utils.php /
 
 # Arbitrary user suport
-RUN	chmod g+w \
+RUN mkdir -p /var/log/apache2 \
+    && chmod g+w \
         /run/apache2 \
         /etc/apache2/httpd.conf \
+        /var/log/apache2 \
         $RACKTABLES_PATH/plugins \
         $RACKTABLES_PATH/scripts \
         $RACKTABLES_PATH/gateways \
         $RACKTABLES_PATH/wwwroot/inc \
     && chgrp root \
         /run/apache2 \
+        /var/log/apache2 \
         /etc/apache2/httpd.conf \
         $RACKTABLES_PATH/plugins \
         $RACKTABLES_PATH/scripts \
@@ -87,6 +90,6 @@ RUN	chmod g+w \
     && chmod +x /docker-entrypoint.sh
 
 EXPOSE 8080
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 

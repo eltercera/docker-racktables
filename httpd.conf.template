@@ -103,8 +103,8 @@ ServerSignature Off
 </Directory>
 
 
-DocumentRoot "${RACKTABLES_PATH}"
-<Directory "/var/www/localhost/htdocs">
+DocumentRoot "${RACKTABLES_PATH}/wwwroot"
+<Directory "${RACKTABLES_PATH}/wwwroot">
     Options Indexes FollowSymLinks
     AllowOverride None
     Require all granted
@@ -118,7 +118,7 @@ DocumentRoot "${RACKTABLES_PATH}"
     Require all denied
 </Files>
 
-ErrorLog logs/error.log
+ErrorLog /var/log/apache2/error.log
 
 LogLevel warn
 
@@ -148,7 +148,7 @@ LogLevel warn
     # If you prefer a logfile with access, agent, and referer information
     # (Combined Logfile Format) you can use the following directive.
     #
-    CustomLog logs/access.log combined
+    CustomLog /var/log/apache2/access.log combined
 </IfModule>
 
 <IfModule headers_module>

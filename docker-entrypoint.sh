@@ -17,8 +17,8 @@
 # along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
 
 
-APACHE_HTTP_PORT=${APACHE_HTTP_PORT:-"8080"}
-SERVER_ADMIN=${SERVER_ADMIN:-"admin@example.com"}
+export APACHE_HTTP_PORT=${APACHE_HTTP_PORT:-"8080"}
+export SERVER_ADMIN=${SERVER_ADMIN:-"admin@example.com"}
 
 if [ -w /etc/apache2/httpd.conf ]; then
 	cat /etc/apache2/httpd.conf.template | envsubst '${APACHE_HTTP_PORT} ${RACKTABLES_PATH} ${SERVER_ADMIN}' > /etc/apache2/httpd.conf
@@ -30,6 +30,7 @@ fi
 
 if [ ! -z $RACKTABLES_INIT_DB ]; then
 	php /init_racktables_db.php || exit $?
+	exit 0
 fi
 
 if [ -f /run/apache2/httpd.pid ];then
