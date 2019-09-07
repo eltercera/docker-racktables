@@ -91,7 +91,7 @@ Now, go to [http://localhost:8080/](http://localhost:8080/) and login whit user 
 
 * **RACKTABLES_DB_HOST:** (Default: "mariadb") Hostname for database connection.
 * **RACKTABLES_DB_NAME:** (Default: "racktables") Database name.
-* **RACKTABLES_DB_PASSWORD:** (Default: "racktables") User password for database connection.
+* **RACKTABLES_DB_PASSWORD or RACKTABLES_DB_PASSWORD_FILE:** (Default: "racktables") User password for database connection.
 * **RACKTABLES_DB_PORT:** (Default: "3306") TCP port for database connection.
 * **RACKTABLES_DB_USERNAME:** (Default: "racktables") User name for database connection.
 * **RACKTABLES_INIT_DB:** Set any value to try initialize database.
@@ -115,10 +115,8 @@ See: [https://wiki.racktables.org/index.php/LDAP](https://wiki.racktables.org/in
 * **RACKTABLES_LDAP_OPTIONS** Use Json format for pass options.
 * **RACKTABLES_LDAP_PORT**
 * **RACKTABLES_LDAP_SEARCH_ATTR**
-* **RACKTABLES_LDAP_SEARCH_BIND_PASSWORD**
+* **RACKTABLES_LDAP_SEARCH_BIND_PASSWORD** or **RACKTABLES_LDAP_SEARCH_BIND_PASSWORD_FILE**
 * **RACKTABLES_LDAP_SEARCH_BIND_RDN**
 * **RACKTABLES_LDAP_SEARCH_DN**
 * **RACKTABLES_LDAP_SERVER** (required)
 * **RACKTABLES_LDAP_USE_TLS**
-
-
