@@ -67,8 +67,7 @@ RUN wget -q https://github.com/RackTables/racktables/archive/RackTables-$RACKTAB
 	&& mv racktables-RackTables-$RACKTABLES_VERSION $RACKTABLES_PATH
 
 ADD httpd.conf.template /etc/apache2/httpd.conf.template
-ADD docker-entrypoint.sh /docker-entrypoint.sh
-ADD make_racktables_secret.php /make_racktables_secret.php
+ADD docker-entrypoint.sh make_racktables_secret.php init_racktables_db.php utils.php /
 
 # Arbitrary user suport
 RUN	chmod g+w \

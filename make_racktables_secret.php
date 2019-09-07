@@ -17,33 +17,10 @@
  * along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* Script file to generate ractables secret.php file from values on env vars */
+require_once 'utils.php';
 
-/**
- * Get Config var from enviroment
- * @param string $name name of env var
- * @param string $default default value
- * @param boolean $is_secret TRUE for try to get value from content of path $name . "_FILE"
- * @return unknown|string
- */
-function docker_get_config($required, $name, $default=null, $is_secret=false)
-{
-    if ($is_secret) {
-        $value = docker_get_config(FALSE, $name . '_FILE');
-        if ($value and is_readable($value)) {
-            return str_replace(["\r", "\n"], '', file_get_contents($value));
-        }
-    }
-    $value = getenv($name);
-    if ($value) {
-        return $value;
-    }
-    if ($required) {
-        echo "$name env var is required" . PHP_EOL;
-        exit(10);
-    }
-    return $default;
-}
+define('RACKTABLES_PATH', realpath(docker_get_config(true, 'RACKTABLES_PATH')));
+define('RACKTABLES_SECRET_PATH', path_join(RACKTABLES_PATH, 'wwwroot', 'inc', 'secret.php'));
 
 /**
  * Process var string type
@@ -158,67 +135,71 @@ function docker_proc_config_array($required, $vars)
     return $ret;
 }
 
-define('RACKTABLES_PATH', realpath(docker_get_config(true, 'RACKTABLES_PATH')));
-define('RACKTABLES_SECRET_PATH', RACKTABLES_PATH . '/wwwroot/inc/secret.php');
+/**
+ * Generate racktables secret.php file from values on env vars
+ * @return boolean
+ */
+function docker_make_secret()
+{
+    /* List of all vars to proc */
+    $required_settings = [
+        'pdo_dsn' => ['docker_proc_config_pdo_dsn'],
+        'db_username' => ['docker_proc_config_str', false, 'RACKTABLES_DB_USERNAME', 'racktables'],
+        'db_password' => ['docker_proc_config_str', false, 'RACKTABLES_DB_PASSWORD', 'racktables', true],
+        'user_auth_src' => ['docker_proc_config_str', false, 'RACKTABLES_USER_AUTH_SRC', 'database'],
+        'require_local_account' => ['docker_proc_config_bool', false, 'RACKTABLES_REQUIRE_LOCAL_ACCOUNT', true],
+        'racktables_plugins_dir' => ['docker_proc_config_str', false, 'RACKTABLES_PLUGINS_DIR'],
+        'pdo_ssl_key' => ['docker_proc_config_str', false, 'RACKTABLES_PDO_SSL_KEY'],
+        'pdo_ssl_cert' => ['docker_proc_config_str', false, 'RACKTABLES_PDO_SSL_CERT'],
+        'pdo_ssl_ca' => ['docker_proc_config_str', false, 'RACKTABLES_PDO_SSL_CA'],
+        'helpdesk_banner' => ['docker_proc_config_str', false, 'RACKTABLES_HELPDESK_BANNER'],
+        'LDAP_options' => ['docker_proc_config_array', false, [
+            'server' => ['docker_proc_config_str', true, 'RACKTABLES_LDAP_SERVER'],
+            'port' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_PORT'],
+            'domain' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_DOMAIN'],
+            'search_attr' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_SEARCH_ATTR'],
+            'search_dn' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_SEARCH_DN'],
+            'search_bind_rdn' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_SEARCH_BIND_RDN'],
+            'search_bind_password' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_SEARCH_BIND_PASSWORD', null, true],
+            'displayname_attrs' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_DISPLAYNAME_ATTRS'],
+            'group_attr' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_GROUP_ATTR'],
+            'group_filter' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_GROUP_FILTER'],
+            'cache_refresh' => ['docker_proc_config_int', false, 'RACKTABLES_LDAP_CACHE_REFRESH'],
+            'cache_retry' => ['docker_proc_config_int', false, 'RACKTABLES_LDAP_CACHE_RETRY'],
+            'cache_expiry' => ['docker_proc_config_int', false, 'RACKTABLES_LDAP_CACHE_EXPIRY'],
+            'options' => ['docker_proc_config_ldapopt', false, 'RACKTABLES_LDAP_OPTIONS'],
+            'use_tls' => ['docker_proc_config_int', false, 'RACKTABLES_LDAP_USE_TLS']
+        ]],
+        'SAML_options' => ['docker_proc_config_array', false, [
+            'simplesamlphp_basedir' => ['docker_proc_config_str', true, 'RACKTABLES_SAML_SIMPLESAMLPHP_BASEDIR'],
+            'sp_profile' => ['docker_proc_config_str', true, 'RACKTABLES_SAML_sp_profile'],
+            'usernameAttribute' => ['docker_proc_config_str', true, 'RACKTABLES_SAML_USERNAMEATTRIBUTE'],
+            'fullnameAttribute' => ['docker_proc_config_str', true, 'RACKTABLES_SAML_FULLNAMEATTRIBUTE'],
+            'fullnameAttribute' => ['docker_proc_config_str', false, 'RACKTABLES_SAML_FULLNAMEATTRIBUTE'],
+        ]]
+    ];
 
-/* List of all vars to proc */
-$required_settings = [
-    'pdo_dsn' => ['docker_proc_config_pdo_dsn'],
-    'db_username' => ['docker_proc_config_str', false, 'RACKTABLES_DB_USERNAME', 'racktables'],
-    'db_password' => ['docker_proc_config_str', false, 'RACKTABLES_DB_PASSWORD', 'racktables', true],
-    'user_auth_src' => ['docker_proc_config_str', false, 'RACKTABLES_USER_AUTH_SRC', 'database'],
-    'require_local_account' => ['docker_proc_config_bool', false, 'RACKTABLES_REQUIRE_LOCAL_ACCOUNT', true],
-    'racktables_plugins_dir' => ['docker_proc_config_str', false, 'RACKTABLES_PLUGINS_DIR'],
-    'pdo_ssl_key' => ['docker_proc_config_str', false, 'RACKTABLES_PDO_SSL_KEY'],
-    'pdo_ssl_cert' => ['docker_proc_config_str', false, 'RACKTABLES_PDO_SSL_CERT'],
-    'pdo_ssl_ca' => ['docker_proc_config_str', false, 'RACKTABLES_PDO_SSL_CA'],
-    'helpdesk_banner' => ['docker_proc_config_str', false, 'RACKTABLES_HELPDESK_BANNER'],
-    'LDAP_options' => ['docker_proc_config_array', false, [
-        'server' => ['docker_proc_config_str', true, 'RACKTABLES_LDAP_SERVER'],
-        'port' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_PORT'],
-        'domain' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_DOMAIN'],
-        'search_attr' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_SEARCH_ATTR'],
-        'search_dn' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_SEARCH_DN'],
-        'search_bind_rdn' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_SEARCH_BIND_RDN'],
-        'search_bind_password' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_SEARCH_BIND_PASSWORD', null, true],
-        'displayname_attrs' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_DISPLAYNAME_ATTRS'],
-        'group_attr' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_GROUP_ATTR'],
-        'group_filter' => ['docker_proc_config_str', false, 'RACKTABLES_LDAP_GROUP_FILTER'],
-        'cache_refresh' => ['docker_proc_config_int', false, 'RACKTABLES_LDAP_CACHE_REFRESH'],
-        'cache_retry' => ['docker_proc_config_int', false, 'RACKTABLES_LDAP_CACHE_RETRY'],
-        'cache_expiry' => ['docker_proc_config_int', false, 'RACKTABLES_LDAP_CACHE_EXPIRY'],
-        'options' => ['docker_proc_config_ldapopt', false, 'RACKTABLES_LDAP_OPTIONS'],
-        'use_tls' => ['docker_proc_config_int', false, 'RACKTABLES_LDAP_USE_TLS']
-    ]],
-    'SAML_options' => ['docker_proc_config_array', false, [
-        'simplesamlphp_basedir' => ['docker_proc_config_str', true, 'RACKTABLES_SAML_SIMPLESAMLPHP_BASEDIR'],
-        'sp_profile' => ['docker_proc_config_str', true, 'RACKTABLES_SAML_sp_profile'],
-        'usernameAttribute' => ['docker_proc_config_str', true, 'RACKTABLES_SAML_USERNAMEATTRIBUTE'],
-        'fullnameAttribute' => ['docker_proc_config_str', true, 'RACKTABLES_SAML_FULLNAMEATTRIBUTE'],
-        'fullnameAttribute' => ['docker_proc_config_str', false, 'RACKTABLES_SAML_FULLNAMEATTRIBUTE'],
-    ]]
-];
-
-if (file_exists(RACKTABLES_SECRET_PATH) && ! is_writable(RACKTABLES_SECRET_PATH)) {
-    echo "File " . RACKTABLES_SECRET_PATH . " is not writable." . PHP_EOL;
-    exit(13);
-}
-
-$file_secret = fopen(RACKTABLES_SECRET_PATH, 'w+');
-
-if (! $file_secret) {
-    echo "Can not open file " . RACKTABLES_SECRET_PATH . PHP_EOL;
-    exit(14);
-}
-
-fwrite($file_secret, '<?php' . PHP_EOL);
-
-foreach ($required_settings as $var_name => $args) {
-    $value = docker_proc_config(...$args);
-    if(! is_null($value)) {
-        fwrite($file_secret, '$'. $var_name . ' = ' . var_export($value, TRUE) . ';' . PHP_EOL);
+    if (file_exists(RACKTABLES_SECRET_PATH) && ! is_writable(RACKTABLES_SECRET_PATH)) {
+        echo "File " . RACKTABLES_SECRET_PATH . " is not writable." . PHP_EOL;
+        return false;
     }
+
+    $file_data = '<?php' . PHP_EOL;
+
+    foreach ($required_settings as $var_name => $args) {
+        $value = docker_proc_config(...$args);
+        if(! is_null($value)) {
+            $file_data .= '$'. $var_name . ' = ' . var_export($value, TRUE) . ';' . PHP_EOL;
+        }
+    }
+
+    $bytes = file_put_contents(RACKTABLES_SECRET_PATH, $file_data);
+
+    if (! $bytes) {
+        echo "Error on write file " . RACKTABLES_SECRET_PATH . PHP_EOL;
+        return false;
+    }
+    return true;
 }
 
-fclose($file_secret);
-exit(0);
+docker_make_secret();

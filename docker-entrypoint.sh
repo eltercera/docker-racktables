@@ -24,11 +24,13 @@ if [ -w /etc/apache2/httpd.conf ]; then
 	cat /etc/apache2/httpd.conf.template | envsubst '${APACHE_HTTP_PORT} ${RACKTABLES_PATH} ${SERVER_ADMIN}' > /etc/apache2/httpd.conf
 fi
 
-if [ ! -f /etc/apache2/httpd.conf ]; then
+if [ ! -f $RACKTABLES_PATH/wwwroot/inc/secret.php ]; then
 	php /make_racktables_secret.php || exit $?
 fi
 
-
+if [ ! -z $RACKTABLES_INIT_DB ]; then
+	php /init_racktables_db.php || exit $?
+fi
 
 if [ -f /run/apache2/httpd.pid ];then
 	rm /run/apache2/httpd.pid
