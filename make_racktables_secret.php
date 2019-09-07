@@ -80,8 +80,8 @@ function docker_proc_config_ldapopt($required, $env_name)
  */
 function docker_proc_config_pdo_dsn()
 {
-    $host = docker_get_config(true, 'RACKTABLES_DB_HOST');
-    $dbname = docker_get_config(true, 'RACKTABLES_DB_NAME');
+    $host = docker_get_config(false, 'RACKTABLES_DB_HOST', 'mariadb');
+    $dbname = docker_get_config(false, 'RACKTABLES_DB_NAME', 'racktables');
     $dbport = docker_get_config(false, 'RACKTABLES_DB_PORT', '3306');
     return "mysql:host=$host;dbname=$dbname;port=$dbport";
 }
@@ -149,6 +149,7 @@ function docker_make_secret()
         'user_auth_src' => ['docker_proc_config_str', false, 'RACKTABLES_USER_AUTH_SRC', 'database'],
         'require_local_account' => ['docker_proc_config_bool', false, 'RACKTABLES_REQUIRE_LOCAL_ACCOUNT', true],
         'racktables_plugins_dir' => ['docker_proc_config_str', false, 'RACKTABLES_PLUGINS_DIR'],
+        'pdo_bufsize' => ['docker_proc_config_int', false, 'RACKTABLES_PDO_BUFSIZE'],
         'pdo_ssl_key' => ['docker_proc_config_str', false, 'RACKTABLES_PDO_SSL_KEY'],
         'pdo_ssl_cert' => ['docker_proc_config_str', false, 'RACKTABLES_PDO_SSL_CERT'],
         'pdo_ssl_ca' => ['docker_proc_config_str', false, 'RACKTABLES_PDO_SSL_CA'],
@@ -170,12 +171,12 @@ function docker_make_secret()
             'options' => ['docker_proc_config_ldapopt', false, 'RACKTABLES_LDAP_OPTIONS'],
             'use_tls' => ['docker_proc_config_int', false, 'RACKTABLES_LDAP_USE_TLS']
         ]],
+        ## TODO
         'SAML_options' => ['docker_proc_config_array', false, [
             'simplesamlphp_basedir' => ['docker_proc_config_str', true, 'RACKTABLES_SAML_SIMPLESAMLPHP_BASEDIR'],
-            'sp_profile' => ['docker_proc_config_str', true, 'RACKTABLES_SAML_sp_profile'],
+            'sp_profile' => ['docker_proc_config_str', true, 'RACKTABLES_SAML_SP_PROFILE'],
             'usernameAttribute' => ['docker_proc_config_str', true, 'RACKTABLES_SAML_USERNAMEATTRIBUTE'],
             'fullnameAttribute' => ['docker_proc_config_str', true, 'RACKTABLES_SAML_FULLNAMEATTRIBUTE'],
-            'fullnameAttribute' => ['docker_proc_config_str', false, 'RACKTABLES_SAML_FULLNAMEATTRIBUTE'],
         ]]
     ];
 

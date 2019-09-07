@@ -98,7 +98,7 @@ ServerAdmin ${SERVER_ADMIN}
 ServerSignature Off
 
 <Directory />
-    AllowOverride none
+    AllowOverride all
     Require all denied
 </Directory>
 
@@ -106,7 +106,7 @@ ServerSignature Off
 DocumentRoot "${RACKTABLES_PATH}/wwwroot"
 <Directory "${RACKTABLES_PATH}/wwwroot">
     Options Indexes FollowSymLinks
-    AllowOverride None
+    AllowOverride all
     Require all granted
 </Directory>
 
