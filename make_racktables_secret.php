@@ -17,7 +17,7 @@
  * along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-require_once 'utils.php';
+require_once '/utils.php';
 
 define('RACKTABLES_PATH', realpath(docker_get_config(true, 'RACKTABLES_PATH')));
 define('RACKTABLES_SECRET_PATH', path_join(RACKTABLES_PATH, 'wwwroot', 'inc', 'secret.php'));

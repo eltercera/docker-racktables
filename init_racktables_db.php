@@ -17,7 +17,7 @@
  * along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-require_once 'utils.php';
+require_once '/utils.php';
 
 define('RACKTABLES_PATH', realpath(docker_get_config(true, 'RACKTABLES_PATH')));
 define('RACKTABLES_SAMPLE_DATA', path_join(RACKTABLES_PATH, 'scripts', 'init-sample-racks.sql'));
