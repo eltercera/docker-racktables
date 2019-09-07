@@ -12,47 +12,65 @@ Racktables is a nifty and robust solution for datacenter and server room asset m
 
 # How to use this image
 
+For create maraidb service:
+
+```
+docker run \
+    --name mariadb \
+    -e MYSQL_ROOT_PASSWORD="SuperAdminPassw" \
+    -e MYSQL_DATABASE="racktables" \
+    -e MYSQL_USER="racktables" \
+    -e MYSQL_PASSWORD="racktablesUserPwd" \
+    -p 3306:3306 \
+    -d mariadb:latest
+```
+
 To initialize database:
 
 ```
 docker run \
-	--rm \
-	--link some-mariadb:mariadb \
-	-e RACKTABLES_DB_HOST=mariadb \
-	-e RACKTABLES_DB_USERNAME=racktables \
-	-e RACKTABLES_DB_PASSWORD="PlsChgMe!" \
-	-e RACKTABLES_DB_NAME=racktables \
-	-e RACKTABLES_INIT_DB=yes \
-	-it eltercera/docker-racktables:latest
+    --rm \
+    --link mariadb:mariadb \
+    -e RACKTABLES_DB_HOST=mariadb \
+    -e RACKTABLES_DB_USERNAME="racktables" \
+    -e RACKTABLES_DB_PASSWORD="racktablesUserPwd" \
+    -e RACKTABLES_DB_NAME="racktables" \
+    -e RACKTABLES_INIT_DB=yes \
+    -e RACKTABLES_ADMIN_PASSWD=RacktablesAdminPasswd \
+    -it eltercera/docker-racktables:latest
 ```
 
-To initialize database whit sample racks data:
-
-```
-docker run \
-	--rm \
-	--link some-mariadb:mariadb \
-	-e RACKTABLES_DB_HOST=mariadb \
-	-e RACKTABLES_DB_USERNAME=racktables \
-	-e RACKTABLES_DB_PASSWORD="PlsChgMe!" \
-	-e RACKTABLES_DB_NAME=racktables \
-	-e RACKTABLES_INIT_DB=yes \
-	-e RACKTABLES_INIT_SAMPLE_RACKS=yes \
-	-it eltercera/docker-racktables:latest
-```
-
-Start continer:
+Or initialize database whit sample racks data:
 
 ```
 docker run \
-  	--link some-mariadb:mariadb \
-	-e RACKTABLES_DB_HOST=mariadb \
-	-e RACKTABLES_DB_USERNAME=racktables \
-	-e RACKTABLES_DB_PASSWORD="PlsChgMe!" \
-	-e RACKTABLES_DB_NAME=racktables \
-  	-p 8080:8080 \
-  	-d eltercera/docker-racktables:latest
+    --rm \
+    --link mariadb:mariadb \
+    -e RACKTABLES_DB_HOST=mariadb \
+    -e RACKTABLES_DB_USERNAME="racktables" \
+    -e RACKTABLES_DB_PASSWORD="racktablesUserPwd" \
+    -e RACKTABLES_DB_NAME="racktables" \
+    -e RACKTABLES_INIT_DB=yes \
+    -e RACKTABLES_ADMIN_PASSWD=RacktablesAdminPasswd \
+    -e RACKTABLES_INIT_SAMPLE_RACKS=yes \
+    -it eltercera/docker-racktables:latest
 ```
+
+Start service:
+
+```
+docker run \
+    --name racktables \
+    --link mariadb:mariadb \
+    -e RACKTABLES_DB_HOST=mariadb \
+    -e RACKTABLES_DB_USERNAME=racktables \
+    -e RACKTABLES_DB_PASSWORD="racktablesUserPwd" \
+    -e RACKTABLES_DB_NAME=racktables \
+    -p 8080:8080 \
+    -d eltercera/docker-racktables:latest
+```
+
+Now, go to [http://localhost:8080/](http://localhost:8080/) and login whit user `admin` and password `RacktablesAdminPasswd`
 
 # Environment variables
 
@@ -63,6 +81,7 @@ docker run \
 
 ## Racktables
 
+* **RACKTABLES_ADMIN_PASSWD:** (Default: "123456") To ser Admin user password on database init.
 * **RACKTABLES_HELPDESK_BANNER:** This HTML banner is intended to assist users in dispatching their issues to the local tech support service. Its text (in its verbatim form) will be appended to assorted error messages visible in user's browser (including "not authenticated" message). Beware of placing any sensitive information here, it will be readable by unauthorized visitors.
 * **RACKTABLES_PLUGINS_DIR:** (Default: "/racktables/plugins") Set this if you need to override the default plugins directory.
 * **RACKTABLES_REQUIRE_LOCAL_ACCOUNT:** (Default: "true")
